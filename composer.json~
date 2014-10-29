@@ -5,17 +5,11 @@
         "illuminate/support": "4.2.*"
     },
     "license": "MIT",
-	"autoload": {
-		        "psr-4" : {
-		            "Exfriend\\CloudFactory\\" : "src/"
-		        }
-		    },
     "authors": [
         {
             "name": "exfriend",
             "email": "i@zlad.tk"
         }
     ],
-
     "minimum-stability": "dev"
 }

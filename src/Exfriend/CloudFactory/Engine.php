@@ -5,10 +5,11 @@ namespace Exfriend\CloudFactory;
 class Engine{
 
 
-	public function __counstruct()
+	public function __construct()
 	{
 
-		echo 'Success!';
+		$this->a = 'b';
+		die( 'Success!');
 
 	}
 
