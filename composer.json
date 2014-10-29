@@ -1,0 +1,15 @@
+{
+    "name": "exfriend/cloudfactory",
+    "description": "Crawler",
+    "require": {
+        "illuminate/support": "4.2.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "exfriend",
+            "email": "i@zlad.tk"
+        }
+    ],
+    "minimum-stability": "dev"
+}
