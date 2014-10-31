@@ -12,6 +12,57 @@ class RequestCollection implements \Countable, \ArrayAccess, ArrayableInterface,
     {
     }
 
+
+    /**
+     * @param $ch
+     * @throws \Exception
+     * @return Request
+     */
+    public function getByCh( $ch )
+    {
+        foreach ( $this->items as $k => $v )
+        {
+            if ( $v->ch == $ch )
+            {
+                return $v;
+            }
+        }
+
+        throw new \Exception( 'Не получается найти ресурс в коллекции' );
+
+    }
+
+    public function getById( $id )
+    {
+
+        foreach ( $this->items as $k => $v )
+        {
+            if ( $v->id == $id )
+            {
+                return $v;
+            }
+        }
+
+        throw new \Exception( 'Не получается найти ресурс в коллекции' );
+
+    }
+
+    public function setById( $request )
+    {
+
+        foreach ( $this->items as $k => $v )
+        {
+            if ( $v->id == $request->id )
+            {
+                $this->items[ $k ] = $request;
+                return true;
+            }
+        }
+
+        throw new \Exception( 'Не получается найти ресурс в коллекции' );
+
+    }
+
     public function add( $request )
     {
         array_push( $this->items, $request );

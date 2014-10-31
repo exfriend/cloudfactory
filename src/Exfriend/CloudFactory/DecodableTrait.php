@@ -3,10 +3,12 @@
 
 namespace Exfriend\CloudFactory;
 
-
 trait DecodableTrait
 {
 
+    /**
+     * @return $this
+     */
     public function decode()
     {
         if ( isset( $this->remoteEncoding ) )
@@ -16,4 +18,4 @@ trait DecodableTrait
         return $this;
     }
 
-} 
+}
