@@ -2,6 +2,19 @@
 
 ```
 
+<?php
+include 'Metrics.php';
+require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer autoload
+use Exfriend\CloudFactory\Engine;
+use Exfriend\CloudFactory\Request;
+
+
+function onSuccess( Request $request )
+{
+    file_put_contents( 'ajax.txt', json_encode( $request->engine->stats->get() ) );
+}
+
+
 $Metrics = Metrics::instance();
 
 $cf = Engine::factory()
@@ -38,5 +51,6 @@ for ( $i = 0; $i < 3000; $i++ )
 }
 
 $cf->run();
+
 
 ```
