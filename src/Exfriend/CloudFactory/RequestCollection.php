@@ -1,10 +1,6 @@
 <?php namespace Exfriend\CloudFactory;
 
-use Illuminate\Support\Contracts\ArrayableInterface;
-
-
-class RequestCollection implements \Countable, \ArrayAccess, ArrayableInterface, \IteratorAggregate
-{
+class RequestCollection implements \Countable, \ArrayAccess, \IteratorAggregate {
 
     protected $items = array();
 

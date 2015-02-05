@@ -1,10 +1,10 @@
 <?php namespace Exfriend\CloudFactory;
 
-class Statistics
-{
+use Symfony\Component\Stopwatch\Stopwatch;
+
+class Statistics {
 
     private $request_info = array();
-    private $engine;
     protected $fields = array(
         'requests_loaded' => 0,
         'requests_total' => 0,
@@ -24,6 +24,10 @@ class Statistics
         'tries_avg' => 0,
         'tries_valid_avg' => 8,
     );
+    /**
+     * @var Stopwatch
+     */
+    private $stopwatch;
 
     private function recount()
     {
@@ -35,9 +39,9 @@ class Statistics
 
         try
         {
-            $this->fields[ 'time_elapsed' ] = \Metrics::instance()->getTotalExecutionTime( 'cloudfactory.run' );
-
-        } catch ( \Exception $e )
+            $this->fields[ 'time_elapsed' ] = $this->stopwatch->getEvent( 'cloudfactory.run' )->getDuration();
+        }
+        catch ( \Exception $e )
         {
             $this->fields[ 'time_elapsed' ] = 0.00001;
         }
@@ -72,8 +76,14 @@ class Statistics
         $this->fields[ 'speed_bytes_per_second' ] = ceil( $this->fields[ 'bytes_received' ] / $this->fields[ 'time_elapsed' ] );
 
         $this->fields[ 'time_eta' ] = $this->fields[ 'time_total_eta' ] - $this->fields[ 'time_elapsed' ];
-
         $this->fields[ 'bytes_eta' ] = $this->fields[ 'bytes_total_eta' ] - $this->fields[ 'bytes_received' ];
+
+        if ( $this->fields[ 'requests_loaded' ] == $this->fields[ 'requests_total' ] )
+        {
+            $this->fields[ 'time_eta' ] = 0;
+            $this->fields[ 'bytes_eta' ] = 0;
+        }
+
     }
 
 
@@ -88,12 +98,13 @@ class Statistics
         $this->fields[ 'requests_total' ]++;
     }
 
+
     public function hook_request_Success( Request $request )
     {
         $this->fields[ 'requests_valid' ]++;
         $this->fields[ 'requests_loaded' ]++;
         $this->request_info [ ] = array(
-            'time_elapsed' => \Metrics::instance()->getTotalExecutionTime( 'cloudfactory.request.' . $request->id ),
+            'time_elapsed' => $this->stopwatch->getEvent( 'cloudfactory.request.' . $request->id )->getDuration(),
             'bytes_received' => $request->info[ 'size_download' ],
             'speed_bytes_per_second' => $request->info[ 'speed_download' ],
             'tries' => $request->tries_current
@@ -105,7 +116,7 @@ class Statistics
         $this->fields[ 'requests_failed' ]++;
         $this->fields[ 'requests_loaded' ]++;
         $this->request_info [ ] = array(
-            'time_elapsed' => \Metrics::instance()->getTotalExecutionTime( 'cloudfactory.request.' . $request->id ),
+            'time_elapsed' => $this->stopwatch->getEvent( 'cloudfactory.request.' . $request->id )->getDuration(),
             'bytes_received' => $request->info[ 'size_download' ],
             'speed_bytes_per_second' => $request->info[ 'speed_download' ],
             'tries' => $request->tries_current
@@ -113,9 +124,9 @@ class Statistics
     }
 
 
-    function __construct( Engine &$engine )
+    function __construct( Stopwatch $stopwatch )
     {
-        $this->engine = $engine;
+        $this->stopwatch = $stopwatch;
     }
 
 

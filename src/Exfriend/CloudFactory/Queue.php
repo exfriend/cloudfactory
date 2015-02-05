@@ -1,7 +1,6 @@
 <?php namespace Exfriend\CloudFactory;
 
-class Queue
-{
+class Queue {
     protected $requests = array();
 
     function __construct( $requests )
@@ -13,13 +12,13 @@ class Queue
     {
         foreach ( $this->requests as $k => $v )
         {
-            if( $v->ch == $ch )
+            if ( $v->ch == $ch )
             {
                 return $v;
             }
         }
 
-        throw new \Exception('Не получается найти ресурс в очереди');
+        throw new \RequestDoesNotExistException( 'Не получается найти ресурс в очереди' );
 
     }
 
