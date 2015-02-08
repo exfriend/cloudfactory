@@ -6,12 +6,16 @@
         "symfony/stopwatch": "2.*"
     },
     "license": "MIT",
+
     "authors": [
         {
             "name": "exfriend",
             "email": "i@zlad.tk"
         }
     ],
+    "autoload": {
+        "psr-4": { "Exfriend\\CloudFactory\\": "src/" }
+    },
 
     "minimum-stability": "dev"
 }
