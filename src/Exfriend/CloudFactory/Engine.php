@@ -7,7 +7,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class Engine {
 
     public $requests;
-    public $threads;
+    public $threads = 100;
     public $queue;
     public $stopwatch;
     public $statistics;
