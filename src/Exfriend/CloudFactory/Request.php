@@ -12,12 +12,11 @@ class Request {
     public $request;
     public $response;
 
-
     public $error = false;
     public $info = array();
 
     public $engine;
-    public $storage = array();
+    public $storage;
     public $ch;
 
     public $tries_current = 0;
@@ -25,6 +24,7 @@ class Request {
 
     public $valid = false;
 
+    private $decode_from = false;
 
     public $callbacks = array(
         'Load' => false,
@@ -59,7 +59,22 @@ class Request {
 
     public function setStorage( $key, $value )
     {
-        $this->storage[ $key ] = $value;
+        $this->storage->set( $key, $value );
+        return $this;
+    }
+
+    public function decodeFrom( $encoding )
+    {
+        $this->decode_from = $encoding;
+    }
+
+    // -------------------------------------------------------------------
+    // --[ some helpful aliases ]-----------------------------------------
+    // -------------------------------------------------------------------
+
+    public function maxTries( $tries_max )
+    {
+        $this->tries_max = $tries_max;
         return $this;
     }
 
@@ -81,8 +96,15 @@ class Request {
 
     public function withCookies( $file )
     {
-        return $this->setOpt( CURLOPT_COOKIEJAR, $file )
-            ->setOpt( CURLOPT_COOKIEFILE, $file );
+
+        if ( file_exists( $file ) )
+        {
+            return $this->setOpt( CURLOPT_COOKIEJAR, $file )
+                ->setOpt( CURLOPT_COOKIEFILE, $file );
+        }
+
+        return $this->setOpt( CURLOPT_COOKIE, $file );
+
     }
 
     public function withSsl()
@@ -91,17 +113,30 @@ class Request {
             ->setOpt( CURLOPT_SSL_VERIFYPEER, 0 );
     }
 
+
+    public function sendHeaders( $headers = array() )
+    {
+        if ( !count( $headers ) )
+            return $this;
+
+        if ( !$this->isAssoc( $headers ) )
+        {
+            $headers = $this->request->mergeAssocHeaders( $headers );
+        }
+
+        return $this->setOpt( CURLOPT_HTTPHEADER, $headers );
+    }
+
+    public function withBasicAuth( $username, $password )
+    {
+
+        return $this->setOpt( CURLOPT_USERPWD, $username . ':' . $password );
+    }
+
     public function withProxy( $ip, $type = CURLPROXY_HTTP )
     {
         return $this->setOpt( CURLOPT_PROXY, $ip )
             ->setOpt( CURLOPT_PROXYTYPE, $type );
-    }
-
-
-    public function maxTries( $tries_max )
-    {
-        $this->tries_max = $tries_max;
-        return $this;
     }
 
     /**
@@ -143,11 +178,15 @@ class Request {
         return $this;
     }
 
-
-
     // ------------------------------------------------------------------------
     // --[ Other ]-------------------------------------------------------------
     // ------------------------------------------------------------------------
+
+    private function isAssoc( $arr )
+    {
+        return array_keys( $arr ) !== range( 0, count( $arr ) - 1 );
+    }
+
 
     public function fire_callback( $name )
     {
@@ -198,6 +237,12 @@ class Request {
             $this->response->body = mb_substr( $responseData, mb_strlen( $responseData ) - $contentLength );
         }
 
+
+        if ( $this->decode_from )
+        {
+            $this->response->body = mb_convert_encoding( $this->response->body, 'UTF-8', $this->decode_from );
+        }
+
     }
 
     /*
@@ -227,8 +272,11 @@ class Request {
     {
         $this->request = new RequestInput();
         $this->response = new RequestOutput();
+        $this->storage = new Storage();
         $this->url = $url;
         $this->ch = curl_init( $url );
+
+        // setting default options
         foreach ( $this->request->options as $key => $value )
         {
             $this->setOpt( $key, $value );
@@ -236,5 +284,6 @@ class Request {
 
         return $this;
     }
+
 
 }

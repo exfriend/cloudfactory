@@ -13,4 +13,18 @@ class RequestInput {
     );
 
 
+    /**
+     * @param $headers
+     * @return array
+     */
+    public function mergeAssocHeaders( $headers )
+    {
+        $new_headers = array();
+        foreach ( $headers as $key => $value )
+        {
+            $new_headers [ ] = $key . ': ' . $value;
+        }
+        return $new_headers;
+    }
+
 }
