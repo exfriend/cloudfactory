@@ -66,6 +66,7 @@ class Request {
     public function decodeFrom( $encoding )
     {
         $this->decode_from = $encoding;
+        return $this;
     }
 
     // -------------------------------------------------------------------
