@@ -12,9 +12,7 @@ class Engine {
     public $stopwatch;
     public $statistics;
 
-    public $options = array(
-        CURLOPT_FOLLOWLOCATION => 1
-    );
+    public $options = array();
 
     /**
      * @return mixed
@@ -37,9 +35,9 @@ class Engine {
     public function clear()
     {
         $this->requests->clear();
-
+        $this->options = array();
         $this->stopwatch = new Stopwatch();
-
+        $this->statistics = new Statistics( $this->stopwatch );
     }
 
     public function run()
