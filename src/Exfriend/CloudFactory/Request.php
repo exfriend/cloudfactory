@@ -44,12 +44,17 @@ class Request {
         return $this;
     }
 
+    public function getOpt( $name )
+    {
+        return isset( $this->request->options [ $name ] ) ? $this->request->options [ $name ] : null;
+    }
+
+
     public function setId( $id )
     {
         $this->id = $id;
         return $this;
     }
-
 
     public function setCallback( $type, $value )
     {
@@ -120,7 +125,7 @@ class Request {
         if ( !count( $headers ) )
             return $this;
 
-        if ( !$this->isAssoc( $headers ) )
+        if ( $this->isAssoc( $headers ) )
         {
             $headers = $this->request->mergeAssocHeaders( $headers );
         }

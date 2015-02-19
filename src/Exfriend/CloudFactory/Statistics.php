@@ -39,7 +39,7 @@ class Statistics {
 
         try
         {
-            $this->fields[ 'time_elapsed' ] = $this->stopwatch->getEvent( 'cloudfactory.run' )->getDuration();
+            $this->fields[ 'time_elapsed' ] = $this->getDuration( 'cloudfactory.run' );
         }
         catch ( \Exception $e )
         {
@@ -104,7 +104,7 @@ class Statistics {
         $this->fields[ 'requests_valid' ]++;
         $this->fields[ 'requests_loaded' ]++;
         $this->request_info [ ] = array(
-            'time_elapsed' => $this->stopwatch->getEvent( 'cloudfactory.request.' . $request->id )->getDuration(),
+            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
             'bytes_received' => $request->info[ 'size_download' ],
             'speed_bytes_per_second' => $request->info[ 'speed_download' ],
             'tries' => $request->tries_current
@@ -116,7 +116,7 @@ class Statistics {
         $this->fields[ 'requests_failed' ]++;
         $this->fields[ 'requests_loaded' ]++;
         $this->request_info [ ] = array(
-            'time_elapsed' => $this->stopwatch->getEvent( 'cloudfactory.request.' . $request->id )->getDuration(),
+            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
             'bytes_received' => $request->info[ 'size_download' ],
             'speed_bytes_per_second' => $request->info[ 'speed_download' ],
             'tries' => $request->tries_current
@@ -127,6 +127,20 @@ class Statistics {
     function __construct( Stopwatch $stopwatch )
     {
         $this->stopwatch = $stopwatch;
+    }
+
+    protected function getDuration( $event )
+    {
+        try
+        {
+            return $this->stopwatch->getEvent( $event )->getDuration();
+        }
+        catch ( \Exception $e )
+        {
+        }
+
+        return 0.01;
+
     }
 
 

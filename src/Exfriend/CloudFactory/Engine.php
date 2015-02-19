@@ -74,8 +74,11 @@ class Engine {
                 $curr_req = $this->requests->getByCh( $done[ 'handle' ] );
                 $curr_req->parseResultContent();
 
-                $this->stopwatch->stop( 'cloudfactory.request.' . $curr_req->id );
 
+                if ( $this->stopwatch->isStarted( 'cloudfactory.request.' . $curr_req->id ) )
+                {
+                    $this->stopwatch->stop( 'cloudfactory.request.' . $curr_req->id );
+                }
                 $curr_req->tries_current++;
                 $this->requests->setById( $curr_req );
 
@@ -112,7 +115,10 @@ class Engine {
                 {
                     curl_multi_add_handle( $master, $n->ch );
 
-                    $this->stopwatch->stop( 'cloudfactory.request.' . $n->id );
+                    if ( $this->stopwatch->isStarted( 'cloudfactory.request.' . $n->id ) )
+                    {
+                        $this->stopwatch->stop( 'cloudfactory.request.' . $n->id );
+                    }
                 }
                 // remove the curl handle that just completed
                 curl_multi_remove_handle( $master, $done[ 'handle' ] );
