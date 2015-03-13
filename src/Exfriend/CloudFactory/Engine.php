@@ -96,6 +96,8 @@ class Engine {
         } while ( $working );
 
         curl_close( $curr_req->ch );
+
+        return $this;
     }
 
 
