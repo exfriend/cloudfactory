@@ -40,6 +40,65 @@ class Engine {
         $this->statistics = new Statistics( $this->stopwatch );
     }
 
+
+    protected function runSingle()
+    {
+
+        $working = true;
+        do
+        {
+            $curr_req = $this->queue->pop();
+            $this->stopwatch->start( 'cloudfactory.request.' . $curr_req->id );
+            curl_exec( $curr_req->ch );
+
+            $this->stopwatch->start( 'cloudfactory.processing' );
+
+            $curr_req->parseResultContent();
+
+            if ( $this->stopwatch->isStarted( 'cloudfactory.request.' . $curr_req->id ) )
+            {
+                $this->stopwatch->stop( 'cloudfactory.request.' . $curr_req->id );
+            }
+
+            $curr_req->tries_current++;
+
+            $this->requests->setById( $curr_req );
+
+            $curr_req->fire_callback( 'Load' );
+            if ( $curr_req->valid )
+            {
+                $this->statistics->hook_request_Success( $curr_req );
+                $curr_req->fire_callback( 'Success' );
+                $working = false;
+            }
+            else
+            {
+                // Вызываем callback, который поменяет прокси or whatever
+                $curr_req->fire_callback( 'Fail' );
+
+                // добавляем запрос обратно в очередь
+                if ( $curr_req->tries_current < $curr_req->tries_max )
+                {
+                    $this->stopwatch->start( 'cloudfactory.request.' . $curr_req->id );
+                    $curr_req->rebuild_handle();
+                    $this->queue->push( $curr_req );
+                }
+                else
+                {
+                    $this->statistics->hook_request_Fail( $curr_req );
+                    $working = false;
+                }
+            }
+
+
+            $this->stopwatch->stop( 'cloudfactory.processing' );
+
+        } while ( $working );
+
+        curl_close( $curr_req->ch );
+    }
+
+
     public function run()
     {
         $this->stopwatch->start( 'cloudfactory.run' );
@@ -47,6 +106,11 @@ class Engine {
         $this->queue = new Queue( $this->requests->toArray() );
 
         $this->threads = ( sizeof( $this->requests ) < $this->threads ) ? sizeof( $this->requests ) : $this->threads;
+
+        if ( $this->threads === 1 )
+        {
+            return $this->runSingle();
+        }
 
         $master = curl_multi_init();
 
@@ -103,6 +167,7 @@ class Engine {
                     }
                     else
                     {
+
                         $this->statistics->hook_request_Fail( $curr_req );
                     }
                 }
