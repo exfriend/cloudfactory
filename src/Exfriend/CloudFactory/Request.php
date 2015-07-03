@@ -222,39 +222,39 @@ class Request {
         $this->error = curl_error( $this->ch );
         $responseData = curl_multi_getcontent( $this->ch );
 
-        if ( $this->request->options[ CURLOPT_HEADER ] == false )
-        {
+//        if ( $this->request->options[ CURLOPT_HEADER ] == false )
+//        {
             $this->response->headers = '';
             $this->response->body = $responseData;
-            return;
-        }
+//            return;
+//        }
 
-        else
-        {
-
-            $contentLength = null;
-            if ( preg_match_all( '/.*Content-Length: (\d+).*/mi', $responseData, $matches ) )
-            {
-                $contentLength = array_pop( $matches[ 1 ] );
-            }
+//        else
+//        {
+//
+//            $contentLength = null;
+  //          if ( preg_match_all( '/.*Content-Length: (\d+).*/mi', $responseData, $matches ) )
+//            {
+//                $contentLength = array_pop( $matches[ 1 ] );
+//            }
 
             // HTTP/1.0 200 Connection established\r\nProxy-agent: Kerio WinRoute Firewall/6.2.2 build 1746\r\n\r\nHTTP
-            if ( stripos( $responseData, "HTTP/1.0 200 Connection established\r\n\r\n" ) !== false )
-            {
-                $responseData = str_ireplace( "HTTP/1.0 200 Connection established\r\n\r\n", '', $responseData );
-            }
-            if ( is_null( $contentLength ) || $contentLength == 0 )
-            {
-                $this->response->headers = mb_substr( $responseData, 0, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
-                $this->response->body = mb_substr( $responseData, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
-            }
-            else
-            {
-                $this->response->headers = mb_substr( $responseData, 0, mb_strlen( $responseData ) - $contentLength );
-                $this->response->body = mb_substr( $responseData, mb_strlen( $responseData ) - $contentLength );
-            }
-
-        }
+//            if ( stripos( $responseData, "HTTP/1.0 200 Connection established\r\n\r\n" ) !== false )
+//            {
+//                $responseData = str_ireplace( "HTTP/1.0 200 Connection established\r\n\r\n", '', $responseData );
+//            }
+//            if ( is_null( $contentLength ) || $contentLength == 0 )
+//            {
+//                $this->response->headers = mb_substr( $responseData, 0, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
+//                $this->response->body = mb_substr( $responseData, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
+//            }
+//            else
+//            {
+//                $this->response->headers = mb_substr( $responseData, 0, mb_strlen( $responseData ) - $contentLength );
+//                $this->response->body = mb_substr( $responseData, mb_strlen( $responseData ) - $contentLength );
+//            }
+//
+//        }
 
         if ( $this->decode_from )
         {
