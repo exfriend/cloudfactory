@@ -113,6 +113,26 @@ class Request {
 
     }
 
+    public function withReferer( $referer = false )
+    {
+        if ( $referer !== 'auto' )
+        {
+            return $this->setOpt( CURLOPT_REFERER, $referer ? $referer : $this->getOpt( CURLOPT_URL ) );
+        }
+
+        return $this->setOpt( CURLOPT_AUTOREFERER, true );
+    }
+
+    public function __toString()
+    {
+        return $this->response->body;
+    }
+
+    public function withUserAgent( $ua = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36' )
+    {
+        return $this->setOpt( CURLOPT_USERAGENT, $ua );
+    }
+
     public function withSsl()
     {
         return $this->setOpt( CURLOPT_SSL_VERIFYHOST, 0 )
@@ -224,8 +244,8 @@ class Request {
 
 //        if ( $this->request->options[ CURLOPT_HEADER ] == false )
 //        {
-            $this->response->headers = '';
-            $this->response->body = $responseData;
+        $this->response->headers = '';
+        $this->response->body = $responseData;
 //            return;
 //        }
 
@@ -233,12 +253,12 @@ class Request {
 //        {
 //
 //            $contentLength = null;
-  //          if ( preg_match_all( '/.*Content-Length: (\d+).*/mi', $responseData, $matches ) )
+        //          if ( preg_match_all( '/.*Content-Length: (\d+).*/mi', $responseData, $matches ) )
 //            {
 //                $contentLength = array_pop( $matches[ 1 ] );
 //            }
 
-            // HTTP/1.0 200 Connection established\r\nProxy-agent: Kerio WinRoute Firewall/6.2.2 build 1746\r\n\r\nHTTP
+        // HTTP/1.0 200 Connection established\r\nProxy-agent: Kerio WinRoute Firewall/6.2.2 build 1746\r\n\r\nHTTP
 //            if ( stripos( $responseData, "HTTP/1.0 200 Connection established\r\n\r\n" ) !== false )
 //            {
 //                $responseData = str_ireplace( "HTTP/1.0 200 Connection established\r\n\r\n", '', $responseData );

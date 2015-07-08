@@ -1,22 +1,49 @@
 {
-    "name": "exfriend/cloudfactory",
-    "description": "A powerful crawling library",
-    "require": {
-        "php": ">=5.4.0",
-        "symfony/stopwatch": "2.*",
-        "guzzlehttp/guzzle": "5.*"
-    },
-    "license": "MIT",
-
-    "authors": [
-        {
-            "name": "exfriend",
-            "email": "i@zlad.tk"
+  "name": "exfriend/cloudfactory",
+  "description": "A powerful crawling library",
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/stopwatch": "2.*"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "exfriend",
+      "email": "i@zlad.tk"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Exfriend\\CloudFactory\\": "src/"}
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "libraries/phpquery",
+        "version": "0.9.5",
+        "dist": {
+          "type": "zip",
+          "url": "http://phpquery.googlecode.com/files/phpQuery-0.9.5.386.zip"
+        },
+        "autoload": {
+          "classmap": ["phpQuery/phpQuery.php"]
         }
-    ],
-    "autoload": {
-        "psr-4": { "Exfriend\\CloudFactory\\": "src/" }
+      }
     },
-
-    "minimum-stability": "dev"
+    {
+      "type": "package",
+      "package": {
+        "name": "libraries/simplehtmldom",
+        "version": "1.5",
+        "dist": {
+          "type": "zip",
+          "url": "http://downloads.sourceforge.net/project/simplehtmldom/simplehtmldom/1.5/simplehtmldom_1_5.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsimplehtmldom%2F&ts=1342886637&use_mirror=kent"
+        },
+        "autoload": {
+          "files": ["simple_html_dom.php"]
+        }
+      }
+    }
+  ],
+  "minimum-stability": "dev"
 }

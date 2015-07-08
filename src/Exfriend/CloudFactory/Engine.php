@@ -101,8 +101,15 @@ class Engine {
     }
 
 
-    public function run()
+    public function run( $req = false )
     {
+        if ( $req )
+        {
+            $this->requests->add( $req );
+            $this->run();
+            return $this->requests->first();
+        }
+
         $this->stopwatch->start( 'cloudfactory.run' );
 
         $this->queue = new Queue( $this->requests->toArray() );
@@ -218,6 +225,7 @@ class Engine {
     {
         return new self();
     }
+
 
     public function addRequest( Request $request )
     {
