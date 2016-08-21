@@ -14,7 +14,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Exfriend\\CloudFactory\\": "src/"
+      "Exfriend\\CloudFactory\\": "src/Exfriend/CloudFactory/"
     }
   },
   "minimum-stability": "stable"
