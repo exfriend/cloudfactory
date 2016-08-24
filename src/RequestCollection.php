@@ -1,8 +1,9 @@
 <?php namespace Exfriend\CloudFactory;
 
-class RequestCollection implements \Countable, \ArrayAccess, \IteratorAggregate {
+class RequestCollection implements \Countable, \ArrayAccess, \IteratorAggregate
+{
 
-    protected $items = array();
+    protected $items = [ ];
 
     function __construct()
     {
@@ -66,7 +67,7 @@ class RequestCollection implements \Countable, \ArrayAccess, \IteratorAggregate 
 
     public function clear()
     {
-        $this->items = array();
+        $this->items = [ ];
     }
 
 

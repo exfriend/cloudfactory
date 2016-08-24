@@ -3,18 +3,18 @@
   "description": "A powerful crawling library",
   "require": {
     "php": ">=5.4.0",
-    "symfony/stopwatch": "2.*"
+    "symfony/stopwatch": "^3.1"
   },
   "license": "MIT",
   "authors": [
     {
-      "name": "exfriend",
+      "name": "Vladislav Otchenashev",
       "email": "i@zlad.tk"
     }
   ],
   "autoload": {
     "psr-4": {
-      "Exfriend\\CloudFactory\\": "src/Exfriend/CloudFactory/"
+      "Exfriend\\CloudFactory\\": "src/"
     }
   },
   "minimum-stability": "stable"

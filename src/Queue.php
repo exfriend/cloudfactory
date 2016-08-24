@@ -1,7 +1,8 @@
 <?php namespace Exfriend\CloudFactory;
 
-class Queue {
-    protected $requests = array();
+class Queue
+{
+    protected $requests = [ ];
 
     function __construct( $requests )
     {
@@ -24,7 +25,7 @@ class Queue {
 
     public function push( Request $request )
     {
-        $this->requests[ ] = $request;
+        $this->requests[] = $request;
     }
 
     public function pop()
@@ -39,6 +40,6 @@ class Queue {
 
     public function clear()
     {
-        $this->requests = array();
+        $this->requests = [ ];
     }
 }

@@ -3,7 +3,8 @@
 namespace Exfriend\CloudFactory;
 
 
-class RequestOutput {
+class RequestOutput
+{
 
     public $headers;
     public $body;

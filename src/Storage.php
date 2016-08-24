@@ -3,9 +3,10 @@
 namespace Exfriend\CloudFactory;
 
 
-class Storage {
+class Storage
+{
 
-    private $data = array();
+    private $data = [ ];
 
     public function set( $key, $value )
     {

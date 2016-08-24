@@ -3,14 +3,15 @@
 namespace Exfriend\CloudFactory;
 
 
-class RequestInput {
+class RequestInput
+{
 
 
-    public $options = array(
+    public $options = [
         CURLOPT_HEADER => true,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-    );
+    ];
 
 
     /**
@@ -19,10 +20,10 @@ class RequestInput {
      */
     public function mergeAssocHeaders( $headers )
     {
-        $new_headers = array();
+        $new_headers = [ ];
         foreach ( $headers as $key => $value )
         {
-            $new_headers [ ] = $key . ': ' . $value;
+            $new_headers [] = $key . ': ' . $value;
         }
         return $new_headers;
     }

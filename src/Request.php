@@ -3,7 +3,8 @@
 use Exfriend\CloudFactory\Exception\ContentLengthUnknownException;
 use Exfriend\CloudFactory\Exception\RequestFailedException;
 
-class Request {
+class Request
+{
 
     public $id = false;
     public $url;
@@ -13,7 +14,7 @@ class Request {
     public $response;
 
     public $error = false;
-    public $info = array();
+    public $info = [ ];
 
     public $engine;
     public $storage;
@@ -23,32 +24,39 @@ class Request {
     public $tries_max = 1;
 
     public $valid = false;
-
-    private $decode_from = false;
-
-    public $callbacks = array(
+    public $callbacks = [
         'Load' => false,
         'Fail' => false,
-        'Success' => false
-    );
+        'Success' => false,
+    ];
+    private $decode_from = false;
 
 
     // ------------------------------------------------------------------------
     // --[ Setters ]---------------------------------------------------------
     // ------------------------------------------------------------------------
 
-    public function setOpt( $name, $value )
+    public function __construct( $url )
     {
-        $this->request->options [ $name ] = $value;
-        curl_setopt( $this->ch, $name, $value );
+        $this->request = new RequestInput();
+        $this->response = new RequestOutput();
+        $this->storage = new Storage();
+        $this->url = $url;
+        $this->ch = curl_init( $url );
+
+        // setting default options
+        foreach ( $this->request->options as $key => $value )
+        {
+            $this->setOpt( $key, $value );
+        }
+
         return $this;
     }
 
-    public function getOpt( $name )
+    public static function factory( $url )
     {
-        return isset( $this->request->options [ $name ] ) ? $this->request->options [ $name ] : null;
+        return new self( $url );
     }
-
 
     public function setId( $id )
     {
@@ -84,20 +92,27 @@ class Request {
         return $this;
     }
 
+    public function withTimeouts( $load, $conn = null )
+    {
+        return $this->withLoadTimeout( $load )
+                    ->withConnectTimeout( $conn );
+    }
+
     public function withConnectTimeout( $conn )
     {
         return $this->setOpt( CURLOPT_CONNECTTIMEOUT, $conn );
     }
 
+    public function setOpt( $name, $value )
+    {
+        $this->request->options [ $name ] = $value;
+        curl_setopt( $this->ch, $name, $value );
+        return $this;
+    }
+
     public function withLoadTimeout( $load )
     {
         return $this->setOpt( CURLOPT_TIMEOUT, $load );
-    }
-
-    public function withTimeouts( $load, $conn = null )
-    {
-        return $this->withLoadTimeout( $load )
-            ->withConnectTimeout( $conn );
     }
 
     public function withCookies( $file )
@@ -106,7 +121,7 @@ class Request {
         if ( file_exists( $file ) )
         {
             return $this->setOpt( CURLOPT_COOKIEJAR, $file )
-                ->setOpt( CURLOPT_COOKIEFILE, $file );
+                        ->setOpt( CURLOPT_COOKIEFILE, $file );
         }
 
         return $this->setOpt( CURLOPT_COOKIE, $file );
@@ -123,6 +138,11 @@ class Request {
         return $this->setOpt( CURLOPT_AUTOREFERER, true );
     }
 
+    public function getOpt( $name )
+    {
+        return isset( $this->request->options [ $name ] ) ? $this->request->options [ $name ] : null;
+    }
+
     public function __toString()
     {
         return $this->response->body;
@@ -136,14 +156,15 @@ class Request {
     public function withSsl()
     {
         return $this->setOpt( CURLOPT_SSL_VERIFYHOST, 0 )
-            ->setOpt( CURLOPT_SSL_VERIFYPEER, 0 );
+                    ->setOpt( CURLOPT_SSL_VERIFYPEER, 0 );
     }
 
-
-    public function sendHeaders( $headers = array() )
+    public function sendHeaders( $headers = [ ] )
     {
         if ( !count( $headers ) )
+        {
             return $this;
+        }
 
         if ( $this->isAssoc( $headers ) )
         {
@@ -152,6 +173,15 @@ class Request {
 
         return $this->setOpt( CURLOPT_HTTPHEADER, $headers );
     }
+
+    private function isAssoc( $arr )
+    {
+        return array_keys( $arr ) !== range( 0, count( $arr ) - 1 );
+    }
+
+    // ------------------------------------------------------------------------
+    // --[ Callbacks ]---------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     public function withBasicAuth( $username, $password )
     {
@@ -162,7 +192,7 @@ class Request {
     public function withProxy( $ip, $type = CURLPROXY_HTTP )
     {
         return $this->setOpt( CURLOPT_PROXY, $ip )
-            ->setOpt( CURLOPT_PROXYTYPE, $type );
+                    ->setOpt( CURLOPT_PROXYTYPE, $type );
     }
 
     /**
@@ -183,7 +213,7 @@ class Request {
     }
 
     // ------------------------------------------------------------------------
-    // --[ Callbacks ]---------------------------------------------------------
+    // --[ Other ]-------------------------------------------------------------
     // ------------------------------------------------------------------------
 
     public function onLoad( callable $callback )
@@ -204,15 +234,10 @@ class Request {
         return $this;
     }
 
-    // ------------------------------------------------------------------------
-    // --[ Other ]-------------------------------------------------------------
-    // ------------------------------------------------------------------------
-
-    private function isAssoc( $arr )
-    {
-        return array_keys( $arr ) !== range( 0, count( $arr ) - 1 );
-    }
-
+    /*
+     * If re-processing the request, we need to rebuild a cURL handle,
+     * cause it deletes automatically by cURL.     *
+     */
 
     public function fire_callback( $name )
     {
@@ -236,45 +261,49 @@ class Request {
     }
 
 
+    // ------------------------------------------------------------------------
+    // --[ Construction ]------------------------------------------------------
+    // ------------------------------------------------------------------------
+
     public function parseResultContent()
     {
         $this->info = curl_getinfo( $this->ch );
         $this->error = curl_error( $this->ch );
         $responseData = curl_multi_getcontent( $this->ch );
 
-//        if ( $this->request->options[ CURLOPT_HEADER ] == false )
-//        {
+        //        if ( $this->request->options[ CURLOPT_HEADER ] == false )
+        //        {
         $this->response->headers = '';
         $this->response->body = $responseData;
-//            return;
-//        }
+        //            return;
+        //        }
 
-//        else
-//        {
-//
-//            $contentLength = null;
+        //        else
+        //        {
+        //
+        //            $contentLength = null;
         //          if ( preg_match_all( '/.*Content-Length: (\d+).*/mi', $responseData, $matches ) )
-//            {
-//                $contentLength = array_pop( $matches[ 1 ] );
-//            }
+        //            {
+        //                $contentLength = array_pop( $matches[ 1 ] );
+        //            }
 
         // HTTP/1.0 200 Connection established\r\nProxy-agent: Kerio WinRoute Firewall/6.2.2 build 1746\r\n\r\nHTTP
-//            if ( stripos( $responseData, "HTTP/1.0 200 Connection established\r\n\r\n" ) !== false )
-//            {
-//                $responseData = str_ireplace( "HTTP/1.0 200 Connection established\r\n\r\n", '', $responseData );
-//            }
-//            if ( is_null( $contentLength ) || $contentLength == 0 )
-//            {
-//                $this->response->headers = mb_substr( $responseData, 0, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
-//                $this->response->body = mb_substr( $responseData, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
-//            }
-//            else
-//            {
-//                $this->response->headers = mb_substr( $responseData, 0, mb_strlen( $responseData ) - $contentLength );
-//                $this->response->body = mb_substr( $responseData, mb_strlen( $responseData ) - $contentLength );
-//            }
-//
-//        }
+        //            if ( stripos( $responseData, "HTTP/1.0 200 Connection established\r\n\r\n" ) !== false )
+        //            {
+        //                $responseData = str_ireplace( "HTTP/1.0 200 Connection established\r\n\r\n", '', $responseData );
+        //            }
+        //            if ( is_null( $contentLength ) || $contentLength == 0 )
+        //            {
+        //                $this->response->headers = mb_substr( $responseData, 0, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
+        //                $this->response->body = mb_substr( $responseData, curl_getinfo( $this->ch, CURLINFO_HEADER_SIZE ) );
+        //            }
+        //            else
+        //            {
+        //                $this->response->headers = mb_substr( $responseData, 0, mb_strlen( $responseData ) - $contentLength );
+        //                $this->response->body = mb_substr( $responseData, mb_strlen( $responseData ) - $contentLength );
+        //            }
+        //
+        //        }
 
         if ( $this->decode_from )
         {
@@ -283,10 +312,6 @@ class Request {
 
     }
 
-    /*
-     * If re-processing the request, we need to rebuild a cURL handle,
-     * cause it deletes automatically by cURL.     *
-     */
     public function rebuild_handle()
     {
         $this->ch = curl_init( $this->url );
@@ -294,33 +319,6 @@ class Request {
         {
             curl_setopt( $this->ch, $key, $value );
         }
-    }
-
-
-    // ------------------------------------------------------------------------
-    // --[ Construction ]------------------------------------------------------
-    // ------------------------------------------------------------------------
-
-    public static function factory( $url )
-    {
-        return new self( $url );
-    }
-
-    public function __construct( $url )
-    {
-        $this->request = new RequestInput();
-        $this->response = new RequestOutput();
-        $this->storage = new Storage();
-        $this->url = $url;
-        $this->ch = curl_init( $url );
-
-        // setting default options
-        foreach ( $this->request->options as $key => $value )
-        {
-            $this->setOpt( $key, $value );
-        }
-
-        return $this;
     }
 
 

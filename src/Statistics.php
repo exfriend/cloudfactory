@@ -2,10 +2,9 @@
 
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class Statistics {
-
-    private $request_info = array();
-    protected $fields = array(
+class Statistics
+{
+    protected $fields = [
         'requests_loaded' => 0,
         'requests_total' => 0,
         'requests_valid' => 0,
@@ -23,11 +22,28 @@ class Statistics {
         'speed_requests_per_second' => 0,
         'tries_avg' => 0,
         'tries_valid_avg' => 8,
-    );
+    ];
+    private $request_info = [ ];
     /**
      * @var Stopwatch
      */
     private $stopwatch;
+
+    function __construct( Stopwatch $stopwatch )
+    {
+        $this->stopwatch = $stopwatch;
+    }
+
+    public function get( $field = null )
+    {
+        $this->recount();
+        if ( $field )
+        {
+            return $this->fields[ $field ];
+        }
+
+        return $this->fields;
+    }
 
     private function recount()
     {
@@ -86,49 +102,6 @@ class Statistics {
 
     }
 
-
-    public function get()
-    {
-        $this->recount();
-        return $this->fields;
-    }
-
-    public function hook_request_add()
-    {
-        $this->fields[ 'requests_total' ]++;
-    }
-
-
-    public function hook_request_Success( Request $request )
-    {
-        $this->fields[ 'requests_valid' ]++;
-        $this->fields[ 'requests_loaded' ]++;
-        $this->request_info [ ] = array(
-            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
-            'bytes_received' => $request->info[ 'size_download' ],
-            'speed_bytes_per_second' => $request->info[ 'speed_download' ],
-            'tries' => $request->tries_current
-        );
-    }
-
-    public function hook_request_Fail( Request $request )
-    {
-        $this->fields[ 'requests_failed' ]++;
-        $this->fields[ 'requests_loaded' ]++;
-        $this->request_info [ ] = array(
-            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
-            'bytes_received' => $request->info[ 'size_download' ],
-            'speed_bytes_per_second' => $request->info[ 'speed_download' ],
-            'tries' => $request->tries_current
-        );
-    }
-
-
-    function __construct( Stopwatch $stopwatch )
-    {
-        $this->stopwatch = $stopwatch;
-    }
-
     protected function getDuration( $event )
     {
         try
@@ -143,5 +116,33 @@ class Statistics {
 
     }
 
+    public function hook_request_add()
+    {
+        $this->fields[ 'requests_total' ]++;
+    }
+
+    public function hook_request_Success( Request $request )
+    {
+        $this->fields[ 'requests_valid' ]++;
+        $this->fields[ 'requests_loaded' ]++;
+        $this->request_info [] = [
+            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
+            'bytes_received' => $request->info[ 'size_download' ],
+            'speed_bytes_per_second' => $request->info[ 'speed_download' ],
+            'tries' => $request->tries_current,
+        ];
+    }
+
+    public function hook_request_Fail( Request $request )
+    {
+        $this->fields[ 'requests_failed' ]++;
+        $this->fields[ 'requests_loaded' ]++;
+        $this->request_info [] = [
+            'time_elapsed' => $this->getDuration( 'cloudfactory.request.' . $request->id ),
+            'bytes_received' => $request->info[ 'size_download' ],
+            'speed_bytes_per_second' => $request->info[ 'speed_download' ],
+            'tries' => $request->tries_current,
+        ];
+    }
 
 } 
