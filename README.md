@@ -72,6 +72,13 @@ foreach ($engine->requests->processed() as $request) {
 }
 ```
 
+### Request priority
+
+You can set priority for each request by using `->withPriority(int)`.
+This way when it comes to pulling the request from the queue, they will be sorted by priority.
+
+The more priority you set, the higher your request will be in the queue.
+
 ### Request callbacks
 
 ```
