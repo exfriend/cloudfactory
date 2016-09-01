@@ -20,7 +20,7 @@ $engine = (new Engine())
 
 for ($i = 0; $i < 10; $i++) {
     $currentProxy = $rotator->getWorkingProxy();
-    $request = (new Request('http://httpbin.org/ip'))
+    $request = (new Request('https://httpbin.org/ip'))
         ->withProxy($currentProxy->getProxyString(), CURLPROXY_SOCKS5)
         ->store('proxy', $currentProxy)
         ->store('id', $i)
