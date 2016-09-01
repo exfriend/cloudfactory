@@ -1,7 +1,11 @@
 ![logo](docs/v1.png)
 
 CloudFactory is a nice and powerful library for building crawlers in PHP. It provides a simple, human readable API while keeping all
-power of cURL under the hood.
+power of cURL under the hood. Key feature of CloudFactory is Request Validation. When using proxies in multi-threaded environment
+you will often get lots of problems with timeouts, response spoofing, HTTP/proxy errors and invalid content.
+
+The goal of CloudFactory is to minimize the effort needed for 100% valid content delivery, and you can achieve that by
+using this library.
 
 ###Requirements
 
@@ -37,7 +41,7 @@ $request = (new \Exfriend\CloudFactory\Request('http://httpbin.org/get'))->setOp
 
 
 ### Option setters
-You can set raw curl options as well as use some helpers available on Request object.
+You can set raw curl options as well as use some helpers available on `Request` object.
 
 ```
 $request = (new \Exfriend\CloudFactory\Request('http://httpbin.org/post'))
@@ -103,20 +107,20 @@ $request = (new Request('http://httpbin.org/get'))
 
 ### Response validation
 
-You can validate your responses using validateWith( callable )
-when building a request. Your callable should accept the instance of Request as a parameter
+You can validate your responses using `validateWith( callable )`
+when building a request. Your callable should accept the instance of `Request` as a parameter
 and return boolean true or false as a validity indicator.
 
-Depending on the validity, engine will call callbacks provided with onSuccess or onFail or onLastFail.
+Depending on the validity, engine will call callbacks provided with `onSuccess` or `onFail` or `onLastFail`.
 
-You can set maxTries( int ) to inform the engine how many times the request
+You can set `maxTries( int )` to inform the engine how many times the request
 should be repeated before it fails the last time.
 
 Note that on the last failed try both onFail and onLastFail callback groups will be called.
 
 ### Passing additional data
 
-You can use store(key,value) method when creating the request to
+You can use `store(key,value)` method when creating the request to
 pass any additional data on the storage bag of your request.
 You can access it from callback like this:
 ```
@@ -142,7 +146,7 @@ You can add new requests while engine is still running e.g. from callback.
 
 ### Request collection
 
-When you add a request with $engine->addRequest() it gets pushed to $engine->requests collection.
+When you add a request with `$engine->addRequest()` it gets pushed to `$engine->requests` collection.
 It extends `Illuminate\Support\Collection` which is the powerful
 collection pattern implementation used in Laravel. This means you have all
 the perks like `$htmls = $engine->requests()->processed()->pluck('response')` to get all responses as array.
