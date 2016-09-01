@@ -20,6 +20,7 @@
   },
   "minimum-stability": "stable",
   "require-dev": {
-    "exfriend/support": "^1.0"
+    "exfriend/support": "^1.0",
+    "exfriend/rotator": "^0.1.0"
   }
 }

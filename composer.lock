@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d5b8d9f843006c9fd7d8709c11585dc2",
-    "content-hash": "db59e27e10d4a0460d6d922f04ac1675",
+    "hash": "620b7bcc0dbec15c248569eda5be49a9",
+    "content-hash": "38493e61a688cae18b58150ed2e5c5f6",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -441,6 +441,74 @@
                 "response"
             ],
             "time": "2016-08-06 14:39:51"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "exfriend/rotator",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/exfriend/rotator.git",
+                "reference": "c75a62e49d141e60437cedf7e23c2af4dbac79f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/exfriend/rotator/zipball/c75a62e49d141e60437cedf7e23c2af4dbac79f7",
+                "reference": "c75a62e49d141e60437cedf7e23c2af4dbac79f7",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Exfriend\\Rotator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladislav Otchenashev",
+                    "email": "i@zlad.tk"
+                }
+            ],
+            "description": "Proxy Rotator inspired by @paslandau",
+            "time": "2016-08-21 13:55:51"
+        },
+        {
+            "name": "exfriend/support",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/exfriend/support.git",
+                "reference": "7795eed318d3bca141b9f74f0e8a68055e36b085"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/exfriend/support/zipball/7795eed318d3bca141b9f74f0e8a68055e36b085",
+                "reference": "7795eed318d3bca141b9f74f0e8a68055e36b085",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladislav Otchenashev",
+                    "email": "i@zlad.tk"
+                }
+            ],
+            "description": "Debug helpers",
+            "time": "2016-08-21 12:47:40"
         },
         {
             "name": "symfony/stopwatch",
@@ -492,48 +560,13 @@
             "time": "2016-06-29 05:41:56"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "exfriend/support",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/exfriend/support.git",
-                "reference": "7795eed318d3bca141b9f74f0e8a68055e36b085"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/exfriend/support/zipball/7795eed318d3bca141b9f74f0e8a68055e36b085",
-                "reference": "7795eed318d3bca141b9f74f0e8a68055e36b085",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "helpers.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vladislav Otchenashev",
-                    "email": "i@zlad.tk"
-                }
-            ],
-            "description": "Debug helpers",
-            "time": "2016-08-21 12:47:40"
-        }
-    ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.0"
     },
     "platform-dev": []
 }

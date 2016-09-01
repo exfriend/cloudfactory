@@ -121,8 +121,9 @@ class Engine
                               }
                               $this->handleProcessedRequest($client, $ourRequest);
 
-                          }, function ($error) use ($ourRequest) {
+                          }, function ($error) use ($client, $ourRequest) {
                               $ourRequest->error = $error;
+                              $this->handleProcessedRequest($client, $ourRequest);
                           });
         return $promise;
     }
