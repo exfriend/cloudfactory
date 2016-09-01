@@ -1,6 +1,6 @@
 ![logo](docs/v1.png)
 
-CloudFactory is a nice and powerful library for building crawlers in PHP. It provides a simple, human readable API while keeping all the
+CloudFactory is a nice and powerful library for building crawlers in PHP. It provides a simple, human readable API while keeping all
 power of cURL under the hood.
 
 # Work in Progress

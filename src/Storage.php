@@ -6,22 +6,20 @@ namespace Exfriend\CloudFactory;
 class Storage
 {
 
-    private $data = [ ];
+    private $data = [];
 
-    public function set( $key, $value )
+    public function set($key, $value)
     {
         $this->data[ $key ] = $value;
     }
 
-    public function get( $key, $default = null )
+    public function get($key, $default = null)
     {
-        if ( isset( $this->data[ $key ] ) )
-        {
+        if (isset($this->data[ $key ])) {
             return $this->data[ $key ];
         }
 
-        if ( $default )
-        {
+        if ($default) {
             return $default;
         }
 
