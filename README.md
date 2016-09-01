@@ -169,7 +169,7 @@ You can add multiple callbacks for each state.
 ```
 
 This gives you a possibility to easily write for example proxy 
-rotating trait for your own descendant or `Request` class,
+rotating trait for your own descendant of `Request` class,
 
 ## Examples
 
