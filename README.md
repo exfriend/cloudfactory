@@ -16,7 +16,7 @@ using this library.
 
 ### Installation
 
-`composer require exfriend/cloudfactory=experimental`
+`composer require exfriend/cloudfactory`
 
 ## Basic Usage
 
