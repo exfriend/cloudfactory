@@ -51,7 +51,7 @@ class Request
     /**
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * @var int
@@ -62,7 +62,7 @@ class Request
      * Request constructor.
      * @param $url
      */
-    public function __construct($url)
+    public function __construct( $url )
     {
         $this->url = $url;
         $this->callbacks = new Callbacks();
@@ -73,7 +73,7 @@ class Request
 
         // Workaround to make curl options work in guzzle.
         // This will not affect actual headers.
-        $this->sendHeaders(['']);
+        $this->sendHeaders( [ '' ] );
 
         return $this;
     }
@@ -87,25 +87,25 @@ class Request
         return $this->id;
     }
 
-    public function store($key, $value)
+    public function store( $key, $value )
     {
-        $this->storage->set($key, $value);
+        $this->storage->set( $key, $value );
         return $this;
     }
 
-    public function decodeFrom($encoding)
+    public function decodeFrom( $encoding )
     {
         $this->remote_encoding = $encoding;
         return $this;
     }
 
-    public function maxTries($tries_max)
+    public function maxTries( $tries_max )
     {
         $this->tries_max = $tries_max;
         return $this;
     }
 
-    public function withPriority($priority)
+    public function withPriority( $priority )
     {
         $this->priority = $priority;
         return $this;
@@ -116,36 +116,31 @@ class Request
      * Callbacks
      */
 
-    public function fireCallback($name)
+    public function fireCallback( $name )
     {
-        $this->callbacks->call($name, $this);
+        $this->callbacks->call( $name, $this );
         return $this;
     }
 
-    public function onSuccess(callable $callback)
+    public function onSuccess( $callback )
     {
-        return $this->addCallback('success', $callback);
+        return $this->addCallback( 'success', $callback );
     }
 
-    /**
-     * @param string $name
-     * @param callable $callback
-     * @return $this
-     */
-    public function addCallback($name, callable $callback)
+    public function addCallback( $name, $callback )
     {
-        $this->callbacks->add($name, $callback);
+        $this->callbacks->add( $name, $callback );
         return $this;
     }
 
-    public function onFail(callable $callback)
+    public function onFail( $callback )
     {
-        return $this->addCallback('fail', $callback);
+        return $this->addCallback( 'fail', $callback );
     }
 
-    public function onLastFail(callable $callback)
+    public function onLastFail( $callback )
     {
-        return $this->addCallback('lastfail', $callback);
+        return $this->addCallback( 'lastfail', $callback );
     }
 
     public function __toString()

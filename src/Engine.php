@@ -18,6 +18,7 @@ class Engine
      * @var int
      */
     public $threads = 100;
+    public $save_requests = true;
 
     public function __construct()
     {
@@ -29,9 +30,15 @@ class Engine
      * @param mixed $threads
      * @return $this
      */
-    public function setThreads($threads)
+    public function setThreads( $threads )
     {
         $this->threads = $threads;
+        return $this;
+    }
+
+    public function dontSaveRequests()
+    {
+        $this->save_requests = false;
         return $this;
     }
 
@@ -49,15 +56,20 @@ class Engine
      * @param Request|array|null $request
      * @return $this
      */
-    public function run($request = null)
+    public function run( $request = null )
     {
-        if ($request) {
-            if (is_array($request)) {
-                foreach ($request as $r) {
-                    $this->addRequest($r);
+        if ( $request )
+        {
+            if ( is_array( $request ) )
+            {
+                foreach ( $request as $r )
+                {
+                    $this->addRequest( $r );
                 }
-            } elseif ($request instanceof Request) {
-                $this->addRequest($request);
+            }
+            elseif ( $request instanceof Request )
+            {
+                $this->addRequest( $request );
             }
         }
 
@@ -71,29 +83,51 @@ class Engine
      * @param Request $request
      * @return $this
      */
-    public function addRequest(Request $request)
+    public function addRequest( Request $request )
     {
-        $request->options->merge($this->options->get());
-        $this->requests->push($request);
+        $request->options->merge( $this->options->get() );
+        $this->requests->push( $request );
 
         return $this;
     }
 
+
     protected function handle()
     {
-        $client = new Client([
+        $client = new Client( [
             'expect' => false,
             'http_errors' => false,
-        ]);
+        ] );
 
-        while ($this->requests->unprocessed()->count()) {
-            (new EachPromise((function () use ($client) {
-                while ($r = $this->requests->unprocessed()->sortByDesc('priority')->first()) {
-                    yield $this->sendRequest($r, $client);
+        while ( $this->requests->unprocessed()->count() )
+        {
+            $this->requests->processed()->map( function ( $item )
+            {
+                if ( !$item->valid() && $item->tries_current < $item->tries_max )
+                {
+                    $item->processed = 0;
                 }
-            })(), [
+            } );
+
+            ( new EachPromise( ( function () use ( $client )
+            {
+                while ( $r = $this->requests->unprocessed()->sortByDesc( 'priority' )->first() )
+                {
+                    yield $this->sendRequest( $r, $client );
+                }
+            } )(), [
                 'concurrency' => $this->threads,
-            ]))->promise()->wait();
+            ] ) )->promise()->wait();
+
+
+            $this->requests->processed()->map( function ( &$item )
+            {
+                if ( !$item->valid() && $item->tries_current < $item->tries_max )
+                {
+                    $item->processed = 0;
+                }
+            } );
+
         }
     }
 
@@ -104,27 +138,31 @@ class Engine
      * @param Client $client
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    protected function sendRequest(Request $ourRequest, Client $client)
+    protected function sendRequest( Request $ourRequest, Client $client )
     {
         $ourRequest->processed = false;
         $ourRequest->processing = true;
-        $request = new GuzzleRequest(($ourRequest->options->get(CURLOPT_POSTFIELDS, false) ? 'POST' : 'GET'),
-            $ourRequest->url);
+        $request = new GuzzleRequest( ( $ourRequest->options->get( CURLOPT_POSTFIELDS, false ) ? 'POST' : 'GET' ),
+            $ourRequest->url );
 
-        $promise = $client->sendAsync($request, ['curl' => $ourRequest->options->get()])
-                          ->then(function ($response) use ($client, $ourRequest) {
+        $promise = $client->sendAsync( $request, [ 'curl' => $ourRequest->options->get() ] )
+                          ->then( function ( $response ) use ( $client, $ourRequest )
+                          {
                               $body = (string)$response->getBody();
                               $ourRequest->response = $body;
-                              if ($ourRequest->remote_encoding) {
-                                  $ourRequest->response = mb_convert_encoding($ourRequest, 'UTF-8',
-                                      $ourRequest->remote_encoding);
+                              $ourRequest->error = false;
+                              if ( $ourRequest->remote_encoding )
+                              {
+                                  $ourRequest->response = mb_convert_encoding( $ourRequest, 'UTF-8',
+                                      $ourRequest->remote_encoding );
                               }
-                              $this->handleProcessedRequest($client, $ourRequest);
+                              $this->handleProcessedRequest( $client, $ourRequest );
 
-                          }, function ($error) use ($client, $ourRequest) {
+                          }, function ( $error ) use ( $client, $ourRequest )
+                          {
                               $ourRequest->error = $error;
-                              $this->handleProcessedRequest($client, $ourRequest);
-                          });
+                              $this->handleProcessedRequest( $client, $ourRequest );
+                          } );
         return $promise;
     }
 
@@ -135,26 +173,35 @@ class Engine
      * @param Request $ourRequest
      * @return bool
      */
-    protected function handleProcessedRequest(Client $client, Request $ourRequest)
+    protected function handleProcessedRequest( Client $client, Request $ourRequest )
     {
         $ourRequest->processed = true;
         $ourRequest->processing = false;
         $ourRequest->tries_current++;
 
 
-        if ($ourRequest->valid()) {
-            $ourRequest->fireCallback('success');
-
+        if ( $ourRequest->valid() )
+        {
+            $ourRequest->fireCallback( 'success' );
+            if ( $this->save_requests == false )
+            {
+                $this->requests->deleteById( $ourRequest->id );
+            }
             return true;
         }
 
-        $ourRequest->fireCallback('fail');
-        if ($ourRequest->tries_current >= $ourRequest->tries_max) {
-            $ourRequest->fireCallback('lastfail');
+        $ourRequest->fireCallback( 'fail' );
+        if ( $ourRequest->tries_current >= $ourRequest->tries_max )
+        {
+            $ourRequest->fireCallback( 'lastfail' );
+            if ( $this->save_requests == false )
+            {
+                $this->requests->deleteById( $ourRequest->id );
+            }
             return false;
         }
 
-        $this->sendRequest($ourRequest, $client);
+        $this->sendRequest( $ourRequest, $client );
 
         return true;
     }
