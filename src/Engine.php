@@ -109,15 +109,15 @@ class Engine
                 }
             } );
 
-            ( new EachPromise( ( function () use ( $client )
+            $fnc = function () use ( $client )
             {
                 while ( $r = $this->requests->unprocessed()->sortByDesc( 'priority' )->first() )
                 {
                     yield $this->sendRequest( $r, $client );
                 }
-            } )(), [
-                'concurrency' => $this->threads,
-            ] ) )->promise()->wait();
+            };
+
+            ( new EachPromise( $fnc(), [ 'concurrency' => $this->threads, ] ) )->promise()->wait();
 
 
             $this->requests->processed()->map( function ( &$item )
